@@ -1,0 +1,9 @@
+<library path="lib/liborbbec_camera">
+
+  <class name="orbbec_camera/OrbbecCameraNodelet" type="orbbec_camera::OrbbecCameraNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      Orbbec camera driver nodelet using the Orbbec SDK for ROS (not the old OpenNI SDK).
+    </description>
+  </class>
+
+</library>

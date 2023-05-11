@@ -20,6 +20,7 @@ find_package(catkin REQUIRED
   image_transport
   message_filters
   message_generation
+  nodelet
   roscpp
   sensor_msgs
   std_srvs
@@ -94,6 +95,7 @@ catkin_package(
   image_transport
   message_filters
   message_runtime
+  nodelet
   roscpp
   sensor_msgs
   std_srvs
@@ -109,6 +111,7 @@ add_library(${PROJECT_NAME}
   src/d2c_viewer.cpp
   src/ob_camera_node.cpp
   src/ob_camera_node_driver.cpp
+  src/ob_camera_nodelet.cpp
   src/ros_sensor.cpp
   src/ros_service.cpp
   src/utils.cpp
@@ -250,6 +253,9 @@ install(DIRECTORY
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/
   )
 
+install(FILES ob_camera_nodelets.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  )
 
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
