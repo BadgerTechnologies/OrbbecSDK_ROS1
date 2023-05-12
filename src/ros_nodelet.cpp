@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+#include <signal.h>
+
 #include "ros/ros.h"
 #include "orbbec_camera/ob_camera_node_driver.h"
 #include "nodelet/nodelet.h"
 #include <pluginlib/class_list_macros.h>
+
+void term_handler(int) {
+  ros::requestShutdown();
+}
 
 namespace orbbec_camera {
 class OBCameraNodelet : public nodelet::Nodelet {
@@ -27,6 +33,10 @@ class OBCameraNodelet : public nodelet::Nodelet {
 
  private:
   void onInit() override {
+    // Handle SIGTERM and SIGINT so that we can shutdown cleanly.
+    // Cameras get into bad states when this is not shutdown cleanly.
+    signal(SIGTERM, term_handler);
+    signal(SIGINT, term_handler);
     ros::NodeHandle nh = getNodeHandle();
     ros::NodeHandle nh_private = getPrivateNodeHandle();
     ob_camera_node_driver_.reset(new OBCameraNodeDriver(nh, nh_private));
