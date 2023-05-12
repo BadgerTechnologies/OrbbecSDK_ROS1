@@ -302,7 +302,7 @@ void OBCameraNodeDriver::queryDevice() {
       if (list->deviceCount() == 0) {
         ROS_WARN_STREAM_THROTTLE(1, "No device found");
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        continue;
+        break;
       }
       try {
         startDevice(list);
@@ -321,11 +321,18 @@ void OBCameraNodeDriver::queryDevice() {
         }
         close(lock_file_fd);
       }
+      if (!device_connected_) {
+        break;
+      }
 
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
+  }
+  if (!device_connected_) {
+    ROS_ERROR_STREAM("No device found. Request shutdown to allow system to restart service");
+    ros::shutdown();
   }
 }
 
