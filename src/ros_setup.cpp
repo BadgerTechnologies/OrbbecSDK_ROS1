@@ -209,20 +209,22 @@ void OBCameraNode::setupProfiles() {
     }
     auto profile_list = sensors_[stream_index]->getStreamProfileList();
     supported_profiles_[stream_index] = profile_list;
-    auto selected_profile = profile_list->getVideoStreamProfile(
-        width_[stream_index], height_[stream_index], format_[stream_index], fps_[stream_index]);
-    auto default_profile = profile_list->getVideoStreamProfile(
-        width_[stream_index], height_[stream_index], format_[stream_index]);
-    if (!selected_profile) {
+    std::shared_ptr<ob::VideoStreamProfile> selected_profile;
+    try {
+      selected_profile = profile_list->getVideoStreamProfile(
+          width_[stream_index], height_[stream_index], format_[stream_index], fps_[stream_index]);
+    } catch (ob::Error& e) {
       ROS_WARN_STREAM("Given stream configuration is not supported by the device! "
                       << " Stream: " << stream_name_[stream_index] << ", Width: "
                       << width_[stream_index] << ", Height: " << height_[stream_index]
                       << ", FPS: " << fps_[stream_index] << ", Format: " << format_[stream_index]);
-      if (default_profile) {
+      try {
+        auto default_profile = profile_list->getVideoStreamProfile(
+            width_[stream_index], height_[stream_index], format_[stream_index]);
         ROS_WARN_STREAM("Using default profile instead.");
         ROS_WARN_STREAM("default FPS " << default_profile->fps());
         selected_profile = default_profile;
-      } else {
+      } catch (ob::Error& e) {
         ROS_WARN_STREAM(" NO default_profile found , Stream: " << stream_index.first
                                                                << " will be disable");
         enable_stream_[stream_index] = false;
