@@ -58,6 +58,8 @@ endif ()
 set(ORBBEC_LIBS ${CMAKE_CURRENT_SOURCE_DIR}/SDK/lib/${HOST_PLATFORM})
 set(ORBBEC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDK/include/)
 
+generate_dynamic_reconfigure_options(cfg/OrbbecCamera.cfg)
+
 add_message_files(
   FILES
   DeviceInfo.msg
@@ -230,6 +232,7 @@ target_link_libraries(list_depth_work_mode_node
   -L${ORBBEC_LIBS}
   )
 add_dependencies(${PROJECT_NAME}
+  ${PROJECT_NAME}_gencfg
   ${PROJECT_NAME}_generate_messages_cpp)
 
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
