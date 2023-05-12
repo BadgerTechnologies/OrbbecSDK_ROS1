@@ -228,6 +228,18 @@ void OBCameraNode::setupProfiles() {
         ROS_WARN_STREAM(" NO default_profile found , Stream: " << stream_index.first
                                                                << " will be disable");
         enable_stream_[stream_index] = false;
+        ROS_INFO_STREAM("Allowed video profiles:");
+        for (size_t j = 0; j < profile_list->count(); j++) {
+          auto profile = profile_list->getProfile(j);
+          if (profile->is<ob::VideoStreamProfile>()) {
+            auto video_profile = profile->as<ob::VideoStreamProfile>();
+            ROS_INFO_STREAM(
+                " width: " << video_profile->width() <<
+                " height: " << video_profile->height() <<
+                " fps: " << video_profile->fps() <<
+                " format: " << video_profile->format());
+          }
+        }
         continue;
       }
     }
