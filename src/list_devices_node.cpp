@@ -41,13 +41,17 @@ int main() {
   context->setLoggerSeverity(OBLogSeverity::OB_LOG_SEVERITY_OFF);
   auto list = context->queryDeviceList();
   for (size_t i = 0; i < list->deviceCount(); i++) {
-    auto device = list->getDevice(i);
-    auto device_info = device->getDeviceInfo();
-    std::string serial = device_info->serialNumber();
-    std::string uid = device_info->uid();
-    auto port_id = parseUsbPort(uid);
-    ROS_INFO_STREAM("serial: " << serial);
-    ROS_INFO_STREAM("port id : " << port_id);
+    try {
+      auto device = list->getDevice(i);
+      auto device_info = device->getDeviceInfo();
+      std::string serial = device_info->serialNumber();
+      std::string uid = device_info->uid();
+      auto port_id = parseUsbPort(uid);
+      ROS_INFO_STREAM("serial: " << serial);
+      ROS_INFO_STREAM("port id : " << port_id);
+    } catch(const ob::Error& e) {
+      ROS_WARN_STREAM("Failed to enumerate device number " << i);
+    }
   }
   return 0;
 }
