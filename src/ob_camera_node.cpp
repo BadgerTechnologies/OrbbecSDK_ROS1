@@ -469,6 +469,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
     camera_info.width = width;
     camera_info.height = height;
     camera_info.header.stamp = timestamp;
+    camera_info.header.frame_id =
+        depth_registration_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
     camera_info_publisher.publish(camera_info);
   }
   CHECK(image_publishers_.count(stream_index));
