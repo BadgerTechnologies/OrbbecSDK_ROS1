@@ -1029,6 +1029,20 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
         stream_index == COLOR ? camera_params_->rgbDistortion : camera_params_->depthDistortion;
 
     auto camera_info = convertToCameraInfo(intrinsic, distortion, width);
+    // Correct IR camera_info for 1280x1024 (SXGA) on Astra Mini Pro.
+    // From inspection, the reported camera intrinsics in 1280x1024 is
+    // identical to 1280x960, and 1280x960 intrinsics are an exact 2x of VGA
+    // (640x480). However, the 1280x960 image centers perfectly on the
+    // 1280x1024 image, meaning the reported central y point for SXGA is 32
+    // pixels too far up in the image. Fix this by adding 32.
+    if (device_info_->pid() == ASTRA_MINI_PRO_PID &&
+        stream_index == INFRA0 &&
+        width_[INFRA0] == 1280 &&
+        height_[INFRA0] == 1024)
+    {
+      camera_info.K[5] += 32;
+      camera_info.P[6] += 32;
+    }
     CHECK(camera_info_publishers_.count(stream_index) > 0);
     auto camera_info_publisher = camera_info_publishers_[stream_index];
     camera_info.width = width;
