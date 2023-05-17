@@ -96,8 +96,7 @@ void OBCameraNode::setupCameraCtrlServices() {
         nh_.advertiseService<std_srvs::SetBoolRequest, std_srvs::SetBoolResponse>(
             service_name, [this, stream_index](std_srvs::SetBoolRequest& request,
                                                std_srvs::SetBoolResponse& response) {
-              response.success = this->toggleSensorCallback(request, response, stream_index);
-              return response.success;
+              return this->toggleSensorCallback(request, response, stream_index);
             });
     service_name = "/" + camera_name_ + "/" + "get_" + stream_name + "_camera_info";
     get_camera_info_srv_[stream_index] =
@@ -554,10 +553,10 @@ bool OBCameraNode::toggleSensorCallback(std_srvs::SetBoolRequest& request,
     ROS_INFO_STREAM(msg);
     response.success = false;
     response.message = msg;
-    return false;
+    return true;
   }
   response.success = toggleSensor(stream_index, request.data, response.message);
-  return response.success;
+  return true;
 }
 
 bool OBCameraNode::toggleSensor(const stream_index_pair& stream_index, bool enabled,
