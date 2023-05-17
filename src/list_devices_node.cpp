@@ -39,11 +39,11 @@ std::string parseUsbPort(const std::string &line) {
   return port_id;
 }
 int main() {
-  try {
-    auto context = std::make_shared<ob::Context>();
-    context->setLoggerSeverity(OBLogSeverity::OB_LOG_SEVERITY_OFF);
-    auto list = context->queryDeviceList();
-    for (size_t i = 0; i < list->deviceCount(); i++) {
+  auto context = std::make_shared<ob::Context>();
+  context->setLoggerSeverity(OBLogSeverity::OB_LOG_SEVERITY_OFF);
+  auto list = context->queryDeviceList();
+  for (size_t i = 0; i < list->deviceCount(); i++) {
+    try {
       auto device = list->getDevice(i);
       auto device_info = device->getDeviceInfo();
       std::string serial = device_info->serialNumber();
@@ -51,13 +51,13 @@ int main() {
       auto port_id = parseUsbPort(uid);
       ROS_INFO_STREAM("serial: " << serial);
       ROS_INFO_STREAM("port id : " << port_id);
+    } catch (ob::Error &e) {
+      ROS_ERROR_STREAM("list_device_node: " << e.getMessage());
+    } catch (const std::exception &e) {
+      ROS_ERROR_STREAM("list_device_node: " << e.what());
+    } catch (...) {
+      ROS_ERROR_STREAM("list_device_node: " << "unknown error");
     }
-  } catch (ob::Error &e) {
-    ROS_ERROR_STREAM("list_device_node: " << e.getMessage());
-  } catch (const std::exception &e) {
-    ROS_ERROR_STREAM("list_device_node: " << e.what());
-  } catch (...) {
-    ROS_ERROR_STREAM("list_device_node: " << "unknown error");
   }
   return 0;
 }
