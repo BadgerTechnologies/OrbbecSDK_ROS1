@@ -1580,7 +1580,6 @@ void OBCameraNode::onNewFrameCallback(std::shared_ptr<ob::Frame> frame,
   auto& seq = image_seq_[stream_index];
   image_msg->header.stamp = timestamp;
   image_msg->is_bigendian = false;
-  image_msg->step = width * unit_step_size_[stream_index];
   image_msg->header.frame_id = frame_id;
   image_msg->header.seq = seq++;
   if (!flip_images_[stream_index]) {
@@ -1593,7 +1592,6 @@ void OBCameraNode::onNewFrameCallback(std::shared_ptr<ob::Frame> frame,
     CHECK_NOTNULL(flipped_image_msg.get());
     flipped_image_msg->header.stamp = timestamp;
     flipped_image_msg->is_bigendian = false;
-    flipped_image_msg->step = width * unit_step_size_[stream_index];
     flipped_image_msg->header.frame_id = frame_id;
     image_publisher.publish(flipped_image_msg);
   }
