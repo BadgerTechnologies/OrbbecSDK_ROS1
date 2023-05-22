@@ -494,7 +494,6 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
   CHECK_NOTNULL(image_msg.get());
   image_msg->header.stamp = timestamp;
   image_msg->is_bigendian = false;
-  image_msg->step = width * unit_step_size_[stream_index];
   image_msg->header.frame_id =
       depth_registration_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
   if (!flip_images_[stream_index]) {
@@ -507,7 +506,6 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
     CHECK_NOTNULL(flipped_image_msg.get());
     flipped_image_msg->header.stamp = timestamp;
     flipped_image_msg->is_bigendian = false;
-    flipped_image_msg->step = width * unit_step_size_[stream_index];
     flipped_image_msg->header.frame_id = depth_registration_ ? depth_aligned_frame_id_[stream_index]
                                                              : optical_frame_id_[stream_index];
     image_publisher.publish(flipped_image_msg);
