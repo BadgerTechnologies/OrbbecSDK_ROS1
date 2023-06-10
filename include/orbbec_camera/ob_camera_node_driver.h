@@ -65,6 +65,7 @@ class OBCameraNodeDriver {
   std::shared_ptr<std::thread> device_count_update_thread_ = nullptr;
   std::recursive_mutex device_lock_;
   std::string lock_file_name_ = "";
+  int lock_file_fd_ = -1;
   int device_num_ = 1;
   int num_devices_connected_ = 0;
 };
