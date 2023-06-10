@@ -98,7 +98,8 @@ void OBCameraNodeDriver::init() {
     deviceDisconnectCallback(removed_list);
   });
   query_thread_ = std::make_shared<std::thread>([this]() { queryDevice(); });
-  device_count_update_thread_ = std::make_shared<std::thread>([this]() { deviceCountUpdate(); });
+  if (device_num_ > 1)
+    device_count_update_thread_ = std::make_shared<std::thread>([this]() { deviceCountUpdate(); });
 }
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
@@ -260,6 +261,8 @@ void OBCameraNodeDriver::deviceDisconnectCallback(
       break;
     }
   }
+  if (device_num_ == 1)
+    return;
   auto connect_event = current_device_disconnected
                            ? DeviceConnectionEvent::kDeviceDisconnected
                            : DeviceConnectionEvent::kOtherDeviceDisconnected;
