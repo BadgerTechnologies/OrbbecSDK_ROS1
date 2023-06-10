@@ -32,6 +32,11 @@ OBCameraNodeDriver::~OBCameraNodeDriver() {
       shmctl(shm_id, IPC_RMID, nullptr);
     }
   }
+  // Be sure to stop the camera node first to stop all streams before stopping
+  // the devcie.
+  ob_camera_node_.reset();
+  device_.reset();
+  device_info_.reset();
 }
 
 void OBCameraNodeDriver::releaseDeviceSemaphore(sem_t* device_sem, int& num_devices_connected) {
