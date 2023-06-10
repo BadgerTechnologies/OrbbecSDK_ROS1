@@ -335,6 +335,10 @@ void OBCameraNodeDriver::resetDeviceThread() {
       device_connected_ = false;
       device_uid_.clear();
       reset_device_ = false;
+
+      ROS_INFO_STREAM("Active device disconnected, shutting down...");
+      is_alive_ = false;
+      ros::requestShutdown();
     }
     ROS_INFO_STREAM("resetDeviceThread: device is disconnected, reset device end");
   }
