@@ -321,6 +321,7 @@ void OBCameraNodeDriver::queryDevice() {
       } catch (...) {
         ROS_WARN_STREAM("Failed to start device");
       }
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
       if (lock_file_fd != -1) {
         if (flock(lock_file_fd, LOCK_UN) < 0) {
           ROS_ERROR_STREAM("Cannot unlock file \"" << lock_file_name_ << "\"!: " << strerror(errno));
@@ -332,8 +333,6 @@ void OBCameraNodeDriver::queryDevice() {
       if (!device_connected_) {
         break;
       }
-
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
