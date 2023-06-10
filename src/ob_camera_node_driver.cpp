@@ -268,6 +268,7 @@ void OBCameraNodeDriver::deviceConnectCallback(const std::shared_ptr<ob::DeviceL
     start_device_failed = true;
     ROS_ERROR_STREAM("Failed to initialize device");
   }
+  std::this_thread::sleep_for(std::chrono::milliseconds(connection_delay_));
   if (start_device_failed) {
     std::unique_lock<decltype(reset_device_lock_)> reset_lock(reset_device_lock_);
     reset_device_ = true;
