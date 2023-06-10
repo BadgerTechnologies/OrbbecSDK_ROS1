@@ -252,12 +252,9 @@ void OBCameraNodeDriver::deviceDisconnectCallback(
     ROS_INFO_STREAM("Device with uid " << device_uid << " disconnected");
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
     if (device_uid == device_uid_) {
-      ob_camera_node_.reset();
-      device_.reset();
-      device_info_.reset();
-      device_connected_ = false;
-      current_device_disconnected = true;
-      device_uid_.clear();
+      ROS_INFO_STREAM("Active device disconnected, shutting down...");
+      is_alive_ = false;
+      ros::requestShutdown();
       break;
     }
   }
