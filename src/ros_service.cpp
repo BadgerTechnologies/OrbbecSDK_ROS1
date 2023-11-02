@@ -19,6 +19,12 @@ namespace orbbec_camera {
 
 void OBCameraNode::setupCameraCtrlServices() {
   using std_srvs::SetBool;
+  reconfigure_server_ = std::make_unique<ReconfigureServer>(nh_private_);
+  reconfigure_server_->setCallback(
+    [this](OrbbecCameraConfig& config, uint32_t /* level */) {
+      this->reconfigureCallback(config);
+    });
+
   for (const auto& stream_index : IMAGE_STREAMS) {
     if (!enable_stream_[stream_index]) {
       ROS_INFO_STREAM("Stream " << stream_name_[stream_index] << " is disabled.");
@@ -215,6 +221,14 @@ void OBCameraNode::setupCameraCtrlServices() {
         response.success = this->switchIRDataSourceChannelCallback(request, response);
         return response.success;
       });
+}
+
+void OBCameraNode::reconfigureCallback(OrbbecCameraConfig& config)
+{
+  std_srvs::SetBoolRequest request;
+  std_srvs::SetBoolResponse response;
+  request.data = !config.disable_emitter;
+  setLaserCallback(request, response);
 }
 
 bool OBCameraNode::setMirrorCallback(std_srvs::SetBoolRequest& request,

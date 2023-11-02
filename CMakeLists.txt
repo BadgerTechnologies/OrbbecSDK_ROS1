@@ -90,6 +90,8 @@ if (USE_RK_HW_DECODER)
   endif ()
 endif ()
 
+generate_dynamic_reconfigure_options(cfg/OrbbecCamera.cfg)
+
 # Message generation
 add_message_files(FILES DeviceInfo.msg Extrinsics.msg Metadata.msg)
 add_service_files(FILES ${SERVICE_FILES})
@@ -209,8 +211,8 @@ target_include_directories(${PROJECT_NAME}_nodelet PUBLIC ${COMMON_INCLUDE_DIRS}
 
 
 # Add dependencies
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
-add_dependencies(${PROJECT_NAME}_nodelet ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME}_nodelet ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
 
 # Macro for adding executables
 macro(add_orbbec_executable TARGET SOURCES)
