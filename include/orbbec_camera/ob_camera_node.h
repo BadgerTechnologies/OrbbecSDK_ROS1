@@ -22,6 +22,7 @@
 #include "ros/ros.h"
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
+#include <dynamic_reconfigure/server.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/distortion_models.h>
@@ -40,6 +41,7 @@
 #include <std_srvs/Empty.h>
 #include "orbbec_camera/d2c_viewer.h"
 #include "orbbec_camera/GetCameraParams.h"
+#include "orbbec_camera/OrbbecCameraConfig.h"
 #include <boost/optional.hpp>
 #include <image_transport/image_transport.h>
 #include <orbbec_camera/Metadata.h>
@@ -50,6 +52,9 @@
 #include <diagnostic_updater/diagnostic_updater.h>
 
 namespace orbbec_camera {
+
+using ReconfigureServer = dynamic_reconfigure::Server<OrbbecCameraConfig>;
+
 class OBCameraNode {
  public:
   OBCameraNode(ros::NodeHandle &nh, ros::NodeHandle &nh_private,
@@ -231,6 +236,8 @@ class OBCameraNode {
 
   void setupCameraInfo();
 
+  void reconfigureCallback(OrbbecCameraConfig& config);
+
   // camera control services
   bool setMirrorCallback(std_srvs::SetBoolRequest &request, std_srvs::SetBoolResponse &response,
                          const stream_index_pair &stream_index);
@@ -381,6 +388,7 @@ class OBCameraNode {
   std::string camera_name_ = "camera";
   std::string accel_gyro_frame_id_ = "camera_accel_gyro_optical_frame";
   const std::string imu_frame_id_ = "camera_gyro_frame";
+  std::unique_ptr<ReconfigureServer> reconfigure_server_ = nullptr;
   std::map<stream_index_pair, ros::ServiceServer> get_exposure_srv_;
   std::map<stream_index_pair, ros::ServiceServer> set_exposure_srv_;
   std::map<stream_index_pair, ros::ServiceServer> set_ae_roi_srv_;
