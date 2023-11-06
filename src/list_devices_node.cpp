@@ -52,7 +52,6 @@ int main() {
       // Badger specific format, parsed by depthcam ID scripts, based on legacy
       // ros_astra_camera format. The parsing scripts need the formatted text to
       // not have ROS log headers, so output directly to stdout.
-      auto device_info = list->getDevice(i)->getDeviceInfo();
       std::cout << "Device #" << i << ":" << std::endl;
       std::cout << "Name: " << device_info->name() << std::endl;
       std::cout << "Firmware version: " << device_info->firmwareVersion() << std::endl;
