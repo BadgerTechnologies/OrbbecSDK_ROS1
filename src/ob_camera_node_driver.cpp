@@ -325,6 +325,8 @@ void OBCameraNodeDriver::queryDevice() {
     CHECK_NOTNULL(list.get());
     if (list->deviceCount() == 0) {
       ROS_WARN_STREAM("No device found");
+      ROS_ERROR_STREAM("No device found. Request shutdown to allow system to restart service");
+      ros::shutdown();
       return;
     }
     deviceConnectCallback(list);
