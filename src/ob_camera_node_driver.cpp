@@ -16,6 +16,7 @@
 
 #include "orbbec_camera/ob_camera_node_driver.h"
 #include <fcntl.h>
+#include <sys/file.h>
 #include <unistd.h>
 #include <semaphore.h>
 #include <sys/shm.h>
@@ -126,6 +127,27 @@ void OBCameraNodeDriver::init() {
   serial_number_ = nh_private_.param<std::string>("serial_number", "");
   usb_port_ = nh_private_.param<std::string>("usb_port", "");
   connection_delay_ = nh_private_.param<int>("connection_delay", 100);
+  lock_file_name_ = nh_private_.param<std::string>("lockfile", "");
+  if (lock_file_name_.size()) {
+    // Grab the lock before creating the context, as creating the context
+    // probes USB devices.
+    lock_file_fd_ = open(lock_file_name_.c_str(), O_RDWR | O_CREAT, 0666);
+    if (lock_file_fd_ == -1) {
+      ROS_ERROR_STREAM("Lock file \"" << lock_file_name_ << "\" could not be opened: " << strerror(errno));
+    } else {
+      int flock_rc;
+      do {
+        flock_rc = flock(lock_file_fd_, LOCK_EX);
+      } while (flock_rc == -1 && errno == EINTR);
+      if (flock_rc == -1) {
+        ROS_ERROR_STREAM("Unable to lock file \"" << lock_file_name_ << "\"!: " << strerror(errno));
+        close(lock_file_fd_);
+        lock_file_fd_ = -1;
+      } else {
+        ROS_INFO_STREAM("File locked for camera " << serial_number_);
+      }
+    }
+  }
   device_num_ = static_cast<int>(nh_private_.param<int>("device_num", 1));
   enumerate_net_device_ = nh_private_.param<bool>("enumerate_net_device", false);
   ip_address_ = nh_private_.param<std::string>("ip_address", "");
@@ -453,6 +475,16 @@ void OBCameraNodeDriver::queryDevice() {
         return;
       }
       deviceConnectCallback(list);
+
+      if (lock_file_fd_ != -1) {
+        if (flock(lock_file_fd_, LOCK_UN) < 0) {
+          ROS_ERROR_STREAM("Cannot unlock file \"" << lock_file_name_ << "\"!: " << strerror(errno));
+        } else {
+          ROS_INFO_STREAM("File unlocked for camera " << serial_number_);
+        }
+        close(lock_file_fd_);
+      }
+
       if (hardware_reset_done_) {
         break;
       }
