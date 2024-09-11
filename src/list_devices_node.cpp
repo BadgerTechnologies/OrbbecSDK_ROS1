@@ -49,16 +49,6 @@ int main() {
       auto port_id = parseUsbPort(uid);
       ROS_INFO_STREAM("serial: " << serial);
       ROS_INFO_STREAM("port id : " << port_id);
-      // Badger specific format, parsed by depthcam ID scripts, based on legacy
-      // ros_astra_camera format. The parsing scripts need the formatted text to
-      // not have ROS log headers, so output directly to stdout.
-      std::cout << "Device #" << i << ":" << std::endl;
-      std::cout << "Name: " << device_info->name() << std::endl;
-      std::cout << "Firmware version: " << device_info->firmwareVersion() << std::endl;
-      std::cout << "UID: " << device_info->uid() <<
-        " (Vendor ID: " << std::hex << device_info->vid() <<
-        ", Product ID: " << std::hex << device_info->pid() << ")" << std::endl;
-      std::cout << "Serial number: " << serial << std::endl;
     } catch(const ob::Error& e) {
       ROS_WARN_STREAM("Failed to enumerate device number " << i);
     }
