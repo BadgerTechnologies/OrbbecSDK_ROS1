@@ -245,10 +245,22 @@ void OBCameraNode::setupCameraCtrlServices() {
 
 void OBCameraNode::reconfigureCallback(OrbbecCameraConfig& config)
 {
+  // Emitter state
   std_srvs::SetBoolRequest request;
   std_srvs::SetBoolResponse response;
   request.data = !config.disable_emitter;
   setLaserCallback(request, response);
+
+  // IR Auto Exposure
+  device_->setBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL, config.ir_auto_exposure);
+  // IR Gain
+  if (!config.ir_auto_exposure) {
+    device_->setIntProperty(OB_PROP_IR_GAIN_INT, config.ir_gain);
+  }
+  // IR Exposure
+  if (!config.ir_auto_exposure) {
+    device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, config.ir_exposure);
+  }
 }
 
 bool OBCameraNode::setMirrorCallback(std_srvs::SetBoolRequest& request,
