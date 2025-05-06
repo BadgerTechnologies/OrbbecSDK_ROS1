@@ -232,6 +232,12 @@ void OBCameraNode::setupCameraCtrlServices() {
         response.success = this->getLrmMeasureDistanceCallback(request, response);
         return response.success;
       });
+  update_firmware_srv_ = nh_.advertiseService<SetStringRequest, SetStringResponse>(
+      "/" + camera_name_ + "/" + "update_firmware",
+      [this](SetStringRequest& request, SetStringResponse& response){
+        response.success = this->updateFirmwareCallback(request, response);
+        return true;
+      });
 }
 
 void OBCameraNode::reconfigureCallback(OrbbecCameraConfig& config)
@@ -904,4 +910,40 @@ bool OBCameraNode::switchIRDataSourceChannelCallback(SetStringRequest& request,
   }
   return false;
 }
+
+bool OBCameraNode::updateFirmwareCallback(SetStringRequest& request, SetStringResponse& response) {
+  std::stringstream ss;
+  try{
+    std::condition_variable cv;
+    OBFwUpdateState final_state;
+    std::mutex mtx;
+    std::atomic<bool> done{false};
+    device_->updateFirmware(
+        request.data.c_str(),
+        [&](OBFwUpdateState state, const char *message, uint8_t percent) {
+          ROS_INFO_STREAM("Update Callback: state = " << state << " message = " << message << " percent = " << (int)percent);
+          if (state == 6 or state == 3 or state < 0) {
+              std::lock_guard<std::mutex> lock(mtx);
+              final_state = state;
+              done = true;
+              cv.notify_one();
+          }
+        },
+        true);
+    std::unique_lock<std::mutex> lock(mtx);
+    cv.wait(lock, [&]() { return done.load(); });
+    return (final_state > 0 ? true : false);
+  } catch (const ob::Error& e) {
+    ss << "Failed to update camera firmware: " << e.getMessage();
+    ROS_ERROR_STREAM(ss.str());
+    response.message = ss.str();
+    return false;
+  } catch (...) {
+    ss << "Unknown error updating camera firmware";
+    ROS_ERROR_STREAM(ss.str());
+    response.message = ss.str();
+    return false;
+  }
+}
+
 }  // namespace orbbec_camera
