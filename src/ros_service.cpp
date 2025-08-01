@@ -261,6 +261,20 @@ void OBCameraNode::reconfigureCallback(OrbbecCameraConfig& config)
   if (!config.ir_auto_exposure) {
     device_->setIntProperty(OB_PROP_IR_EXPOSURE_INT, config.ir_exposure);
   }
+
+  // Noise Removal Filter
+  setFilter("NoiseRemovalFilter", config.enable_noise_removal_filter,
+    convertToFloats(config.noise_min_diff, config.noise_max_size));
+
+  // Temporal Filter
+  setFilter("TemporalFilter", config.enable_temporal_filter,
+    convertToFloats(config.temporal_diff_threshold, config.temporal_weight));
+
+  // Spatial Filter
+  setFilter("SpatialAdvancedFilter", config.enable_spatial_filter,
+    convertToFloats(config.spatial_alpha, config.spatial_diff_threshold, config.spatial_magnitude, config.spatial_radius));
+
+  printFilterSettings();
 }
 
 bool OBCameraNode::setMirrorCallback(std_srvs::SetBoolRequest& request,

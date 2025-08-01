@@ -238,6 +238,10 @@ class OBCameraNode {
 
   void reconfigureCallback(OrbbecCameraConfig& config);
 
+  bool setFilter(std::string filter_name, bool filter_enable, std::vector<float> filter_param);
+
+  void printFilterSettings();
+
   // camera control services
   bool setMirrorCallback(std_srvs::SetBoolRequest &request, std_srvs::SetBoolResponse &response,
                          const stream_index_pair &stream_index);
@@ -339,6 +343,12 @@ class OBCameraNode {
   void init_interleave_mode();
   int init_interleave_hdr_param();
   int init_interleave_laser_param();
+
+  template<typename... Params>
+  std::vector<float> convertToFloats(Params&&... param)
+  {
+    return {static_cast<float>(std::forward<Params>(param))...};
+  }
 
  private:
   ros::NodeHandle nh_;
