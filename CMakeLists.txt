@@ -88,6 +88,9 @@ find_package(Boost REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS filesystem system REQUIRED)
+
+pkg_check_modules(LIBSYSTEMD REQUIRED libsystemd)
+
 # check if boost was found
 if(Boost_FOUND)
     message(STATUS "Boost found!")
@@ -147,6 +150,7 @@ set(COMMON_INCLUDE_DIRS
   ${Boost_INCLUDE_DIRS}
   ${OpenCV_INCLUDED_DIRS}
   ${ORBBEC_INCLUDE_DIR}
+  ${LIBSYSTEMD_INCLUDE_DIRS}
 )
 if (USE_NV_HW_DECODER)
   list(APPEND COMMON_INCLUDE_DIRS
@@ -210,6 +214,7 @@ set(COMMON_LINK_LIBRARIES
   Threads::Threads
   -lrt
   -ldw # for stack trace
+  ${LIBSYSTEMD_LIBRARIES}
 )
 
 if (USE_RK_HW_DECODER)
