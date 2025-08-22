@@ -19,7 +19,13 @@ namespace orbbec_camera {
 
 void OBCameraNode::setupCameraCtrlServices() {
   using std_srvs::SetBool;
+
+  OrbbecCameraConfig init_config;
+  init_config.ir_auto_exposure = device_->getBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL);
+  init_config.ir_gain = device_->getIntProperty(OB_PROP_IR_GAIN_INT);
+  init_config.ir_exposure = device_->getIntProperty(OB_PROP_IR_EXPOSURE_INT);
   reconfigure_server_ = std::make_unique<ReconfigureServer>(nh_private_);
+  reconfigure_server_->setConfigDefault(init_config);
   reconfigure_server_->setCallback(
     [this](OrbbecCameraConfig& config, uint32_t /* level */) {
       this->reconfigureCallback(config);
