@@ -43,6 +43,7 @@
 #include "orbbec_camera/GetCameraParams.h"
 #include "orbbec_camera/OrbbecCameraConfig.h"
 #include <boost/optional.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <image_transport/image_transport.h>
 #include <orbbec_camera/Metadata.h>
 #include <orbbec_camera/IMUInfo.h>
@@ -391,6 +392,7 @@ class OBCameraNode {
   std::string accel_gyro_frame_id_ = "camera_accel_gyro_optical_frame";
   const std::string imu_frame_id_ = "camera_gyro_frame";
   std::unique_ptr<ReconfigureServer> reconfigure_server_ = nullptr;
+  boost::recursive_mutex reconfigure_mutex_;
   std::map<stream_index_pair, ros::ServiceServer> get_exposure_srv_;
   std::map<stream_index_pair, ros::ServiceServer> set_exposure_srv_;
   std::map<stream_index_pair, ros::ServiceServer> set_ae_roi_srv_;

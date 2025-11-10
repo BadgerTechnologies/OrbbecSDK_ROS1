@@ -24,8 +24,12 @@ void OBCameraNode::setupCameraCtrlServices() {
   init_config.ir_auto_exposure = device_->getBoolProperty(OB_PROP_IR_AUTO_EXPOSURE_BOOL);
   init_config.ir_gain = device_->getIntProperty(OB_PROP_IR_GAIN_INT);
   init_config.ir_exposure = device_->getIntProperty(OB_PROP_IR_EXPOSURE_INT);
-  reconfigure_server_ = std::make_unique<ReconfigureServer>(nh_private_);
+  reconfigure_server_ = std::make_unique<ReconfigureServer>(reconfigure_mutex_, nh_private_);
   reconfigure_server_->setConfigDefault(init_config);
+  {
+    boost::recursive_mutex::scoped_lock lock(reconfigure_mutex_);
+    reconfigure_server_->updateConfig(init_config);
+  }
   reconfigure_server_->setCallback(
     [this](OrbbecCameraConfig& config, uint32_t /* level */) {
       this->reconfigureCallback(config);
@@ -251,6 +255,8 @@ void OBCameraNode::setupCameraCtrlServices() {
 
 void OBCameraNode::reconfigureCallback(OrbbecCameraConfig& config)
 {
+  boost::recursive_mutex::scoped_lock lock(reconfigure_mutex_);
+
   // Emitter state
   std_srvs::SetBoolRequest request;
   std_srvs::SetBoolResponse response;
