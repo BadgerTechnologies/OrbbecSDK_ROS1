@@ -16,6 +16,7 @@
 
 #include "orbbec_camera/ob_camera_node.h"
 #include "orbbec_camera/utils.h"
+#include <std_msgs/Int16.h>
 #include <std_msgs/String.h>
 
 namespace orbbec_camera {
@@ -687,6 +688,18 @@ void OBCameraNode::setupDevices() {
       } else {
         ROS_ERROR_STREAM("exposure range mode does not support this setting");
       }
+    }
+    if (device_->isPropertySupported(OB_PROP_LDP_MEASURE_DISTANCE_INT, OB_PERMISSION_READ)) {
+      ldp_status_pub_ = nh_.advertise<std_msgs::Int16>("/" + camera_name_ + "/ldp_status", 1);
+      periodic_ldp_timer_ = nh_.createTimer(ros::Duration(0.1), [this](const ros::TimerEvent&) {
+        try {
+          std_msgs::Int16 ret;
+          ret.data = device_->getIntProperty(OB_PROP_LDP_MEASURE_DISTANCE_INT);
+          ldp_status_pub_.publish(ret);
+        } catch (const ob::Error& e) {
+          ROS_ERROR_THROTTLE(1, ("Failed to acquire LDP information: %s", e.getMessage()));
+        }
+      });
     }
   } catch (const ob::Error& e) {
     ROS_ERROR_STREAM("Failed to setup devices: " << e.getMessage());
