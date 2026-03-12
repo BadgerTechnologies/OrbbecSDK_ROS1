@@ -25,6 +25,7 @@
 #include "orbbec_camera/DeviceInfo.h"
 #include "orbbec_camera/Extrinsics.h"
 #include "orbbec_camera/Metadata.h"
+#include "orbbec_camera/LDPStatus.h"
 #include "orbbec_camera/GetDeviceInfo.h"
 #include "orbbec_camera/GetBool.h"
 #include "orbbec_camera/GetInt32.h"

@@ -453,6 +453,8 @@ class OBCameraNode {
   std::shared_ptr<ob::Config> pipeline_config_ = nullptr;
   ros::Publisher depth_cloud_pub_;
   ros::Publisher depth_registered_cloud_pub_;
+  ros::Publisher ldp_status_pub_;
+  ros::Timer periodic_ldp_timer_;
   sensor_msgs::PointCloud2 cloud_msg_;
   std::recursive_mutex cloud_mutex_;
   std::atomic_bool pipeline_started_{false};

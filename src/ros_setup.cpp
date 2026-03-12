@@ -688,6 +688,20 @@ void OBCameraNode::setupDevices() {
         ROS_ERROR_STREAM("exposure range mode does not support this setting");
       }
     }
+    if (device_->isPropertySupported(OB_PROP_LDP_STATUS_BOOL, OB_PERMISSION_READ) &&
+        device_->isPropertySupported(OB_PROP_LDP_MEASURE_DISTANCE_INT, OB_PERMISSION_READ)) {
+      ldp_status_pub_ = nh_.advertise<orbbec_camera::LDPStatus>("/" + camera_name_ + "/ldp_status", 1);
+      periodic_ldp_timer_ = nh_.createTimer(ros::Duration(0.1), [this](const ros::TimerEvent&) {
+        try {
+          orbbec_camera::LDPStatus ret;
+          ret.detected = device_->getBoolProperty(OB_PROP_LDP_STATUS_BOOL);
+          ret.distance = device_->getIntProperty(OB_PROP_LDP_MEASURE_DISTANCE_INT);
+          ldp_status_pub_.publish(ret);
+        } catch (const ob::Error& e) {
+          ROS_ERROR_THROTTLE(1, ("Failed to acquire LDP information: %s", e.getMessage()));
+        }
+      });
+    }
   } catch (const ob::Error& e) {
     ROS_ERROR_STREAM("Failed to setup devices: " << e.getMessage());
   } catch (const std::exception& e) {
