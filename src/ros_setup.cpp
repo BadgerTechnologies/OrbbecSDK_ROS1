@@ -326,6 +326,10 @@ void OBCameraNode::setupDevices() {
       device_->setBoolProperty(OB_PROP_DEVICE_USB3_REPEAT_IDENTIFY_BOOL,
                                retry_on_usb3_detection_failure_);
     }
+    if (!depth_work_mode_.empty()) {
+      ROS_INFO_STREAM("Set depth work mode: " << depth_work_mode_);
+      device_->switchDepthWorkMode(depth_work_mode_.c_str());
+    }
     if (device_->isPropertySupported(OB_PROP_DEPTH_MAX_DIFF_INT, OB_PERMISSION_WRITE)) {
       auto default_noise_removal_filter_min_diff =
           device_->getIntProperty(OB_PROP_DEPTH_MAX_DIFF_INT);
@@ -357,10 +361,6 @@ void OBCameraNode::setupDevices() {
     if (device_->isPropertySupported(OB_PROP_DEPTH_SOFT_FILTER_BOOL, OB_PERMISSION_READ_WRITE)) {
       device_->setBoolProperty(OB_PROP_DEPTH_SOFT_FILTER_BOOL, enable_noise_removal_filter_);
       ROS_INFO_STREAM("enable_noise_removal_filter:" << enable_noise_removal_filter_);
-    }
-    if (!depth_work_mode_.empty()) {
-      ROS_INFO_STREAM("Set depth work mode: " << depth_work_mode_);
-      device_->switchDepthWorkMode(depth_work_mode_.c_str());
     }
     if (laser_energy_level_ != -1 &&
         device_->isPropertySupported(OB_PROP_LASER_ENERGY_LEVEL_INT, OB_PERMISSION_READ_WRITE)) {
